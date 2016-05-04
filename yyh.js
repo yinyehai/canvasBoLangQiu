@@ -155,7 +155,7 @@
 
 			if(blRect.x > 0-blRect.width)
 			{
-				blRect.x -= speedX;
+				blRect.x -= 3;
 			}
 			else
 			{

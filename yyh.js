@@ -148,14 +148,14 @@
 		var blRect = new BlRect(0, quanjing, quanjing, quanjing, 20,'#24cb24');
 		var zhezhao = new ZhezhaoYuan(0, 0, banjing, border);
 		var shuzhi = new Shuzhi(shuzhi, 0, banjing, banjing, "red");
-		var speedX = banjing / 38;
+		var speedX = banjing / 30;
 		
 		quee.push(function(){
 			ctx.clearRect(0,0,canvas.width,canvas.height);
 
 			if(blRect.x > 0-blRect.width)
 			{
-				blRect.x -= 3;
+				blRect.x -= speedX;
 			}
 			else
 			{

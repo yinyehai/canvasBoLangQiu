@@ -20,13 +20,13 @@
 	*@param 颜色
 	*/
 	var BlRect = (function(){
-		var BlRect = function(x, y, width, height, banjing, background)
+		var BlRect = function(x, y, width, height, background)
 		{
 			this.x = x;
 			this.y = y;
 			this.width = width;
 			this.height = height;
-			this.banjing = banjing;
+			this.banjing = height * 0.1;
 			this.background = background;
 		};
 		BlRect.prototype.draw = function(ctx)
@@ -157,7 +157,7 @@
 			document.body.appendChild(canvas);
 		}
 		var ctx = canvas.getContext('2d');
-		var blRect = new BlRect(0 + offset, quanjing + offset, quanjing + offset, quanjing + offset, 20, background);
+		var blRect = new BlRect(0 + offset, quanjing + offset, quanjing + offset, quanjing + offset, background);
 		var zhezhao = new ZhezhaoYuan(0 + offset, 0 + offset, banjing, borderSize, borderColor);
 		var shuzhi = new Shuzhi(shuzhi, 0, banjing + offset, banjing + offset, fontSize, fontFamily, fontColor);
 		var speedX = banjing / 30;
@@ -165,15 +165,11 @@
 		quee.push(function(){
 			ctx.clearRect(0,0,canvas.width,canvas.height);
 
-			if(blRect.x > 0-blRect.width)
+			blRect.x -= speedX;
+			if(blRect.x < 0-blRect.width)
 			{
-				blRect.x -= speedX;
+				blRect.x = blRect.x + blRect.width;
 			}
-			else
-			{
-				blRect.x = 0;
-			}
-			
 
 			blRect.y =  blRect.height - shuzhi.cur / 100 * blRect.height;
 

@@ -14,9 +14,10 @@
 	})();
 
 	/**形状类
+	*@param x坐标
+	*@param y坐标
 	*@param 宽
 	*@param 高
-	*@param 半径
 	*@param 颜色
 	*/
 	var BlRect = (function(){
@@ -54,6 +55,7 @@
 	*@param x坐标
 	*@param y坐标
 	*@param 半径
+	*@param 边框大小
 	*@param 边框颜色
 	*/
 	var ZhezhaoYuan = (function(){

@@ -13,6 +13,19 @@
 			};
 	})();
 
+	//获取元素位置
+	function getRect(ele) {
+		var rect = ele.getBoundingClientRect();
+		var top = global.document.documentElement.clientTop;
+		var left= global.document.documentElement.clientLeft;
+		return{
+			top: rect.top - top,
+			bottom: rect.bottom - top,
+			left: rect.left - left,
+			right : rect.right - left
+		}
+	}
+
 	/**形状类
 	*@param x坐标
 	*@param y坐标
@@ -27,7 +40,7 @@
 			this.y = y;
 			this.width = width;
 			this.height = height;
-			this.banjing = height * 0.1;
+			this.banjing = height * 0.05;
 			this.background = background;
 		};
 		BlRect.prototype.draw = function(ctx)
@@ -108,27 +121,30 @@
 			this.textBaseline = "middle";
 		};
 		Shuzhi.prototype.draw = function(ctx){
-			var str = this.cur + '%';;
+			var str = Math.floor(this.cur) + '%';;
 			ctx.save();
 			ctx.font = this.fontSize + ' ' + this.fontFamily;
 			ctx.fillStyle = this.fontColor;
 			ctx.translate(this.x, this.y);
 			ctx.textAlign = this.textAlign;
 			ctx.textBaseline = this.textBaseline;
+			ctx.globalCompositeOperation = "xor";
 			ctx.fillText(str, 0, 0);
 			ctx.restore();
 		};
 		return Shuzhi;
 	})();
 
-	//动画队列
+	//动画容器
 	var quee = [];
+	//缓存容器
+	var cacheQuee = [];
 	//动画方法
 	var aniamte = function(){
 		requestAnimFrame(aniamte);
 		for(var i=0; i<quee.length; i++)
 		{
-			quee[i]();
+			quee[i].runner();
 		}
 	};
 	aniamte.flage = true;
@@ -136,6 +152,7 @@
 	//波浪球方法
 	var bolangqiu = function(opts){
 
+		//获取变量
 		var opts = opts || bolangqiu.opts,
 			wrap = opts.wrap || bolangqiu.opts.wrap,
 			banjing = opts.banjing || bolangqiu.opts.banjing,
@@ -162,9 +179,13 @@
 		var blRect = new BlRect(0 + offset, quanjing + offset, quanjing + offset, quanjing + offset, background);
 		var zhezhao = new ZhezhaoYuan(0 + offset, 0 + offset, banjing, borderSize, borderColor);
 		var shuzhi = new Shuzhi(shuzhi, 0, banjing + offset, banjing + offset, fontSize, fontFamily, fontColor);
+		var targetHeight = blRect.height - blRect.height *  shuzhi.shuzhi / 100;
+		var speedC = 0.5;
 		var speedX = banjing / 30;
+		var speedY = shuzhi.shuzhi==0?0:(blRect.y - targetHeight) / shuzhi.shuzhi * speedC;
+		//var speedY = shuzhi.shuzhi==0?0:shuzhi.shuzhi/(blRect.y - targetHeight);
 		
-		quee.push(function(){
+		canvas.runner = function(){
 			ctx.clearRect(0,0,canvas.width,canvas.height);
 
 			blRect.x -= speedX;
@@ -173,7 +194,14 @@
 				blRect.x = blRect.x + blRect.width;
 			}
 
-			blRect.y =  blRect.height - shuzhi.cur / 100 * blRect.height;
+			if(blRect.y > targetHeight)
+			{
+				blRect.y-=speedY;
+			}
+			else
+			{
+				blRect.y = targetHeight;
+			}
 
 			blRect.draw(ctx);
 			
@@ -181,20 +209,55 @@
 
 			if(shuzhi.cur < shuzhi.shuzhi)
 			{
-				shuzhi.cur++;
+				shuzhi.cur += speedC;
 			}
 			else
 			{
 				shuzhi.cur = shuzhi.shuzhi;
 			}
 			shuzhi.draw(ctx);
-		});
+		};
+
+		//动画元素加入缓存
+		cacheQuee.push(canvas);
+
+		//促发滚动条事件
+		winScroll();
+		
+		//开启动画
 		if(aniamte.flage)
 		{
 			aniamte.flage = false;
 			aniamte();
 		}
 	};
+
+	//判断是否在可视窗口中
+	var isInWin = function(ele){
+		var rect = getRect(ele);
+		if(rect.top+ele.height<0 || rect.top>global.document.documentElement.clientHeight)
+		{
+			return false;
+		}
+		if(rect.left+ele.width<0 || rect.left>global.document.documentElement.clientWidth)
+		{
+			return false;
+		}
+		return true;
+	};
+
+	//定义滚动事件
+	var winScroll = function(){
+		quee.length = 0;
+		for(var i=0; i<cacheQuee.length; i++)
+		{
+			if(isInWin(cacheQuee[i]))
+			{
+				quee.push(cacheQuee[i]);
+			}
+		}
+	};
+	global.addEventListener('scroll',winScroll,false);
 	
 	//默认值
 	bolangqiu.opts = {
@@ -209,13 +272,13 @@
 		//字体
 		fontFamily:'Arial',
 		//字体颜色
-		fontColor:'#f00',
+		fontColor:'#24cb24',
 		//边框大小
 		borderSize:'1',
 		//边框颜色
 		borderColor:'#ccc',
 		//数值
-		shuzhi:100
+		shuzhi:50
 	};
 
 	global.YYH.bolangqiu = bolangqiu;

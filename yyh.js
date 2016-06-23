@@ -45,7 +45,14 @@
 		};
 		BlRect.prototype.draw = function(ctx)
 		{
+
+			
+
 			ctx.save();
+
+			if(this.zhezhao){
+				this.zhezhao.draw(ctx);
+			}
 
 			ctx.translate(this.x,this.y);
 			ctx.beginPath();
@@ -57,8 +64,11 @@
 			ctx.closePath();
 			ctx.fillStyle = this.background;
 			ctx.fill();
-
 			ctx.restore();
+
+			if(this.zhezhao){
+				this.zhezhao.stroke(ctx);
+			}
 		}
 		return BlRect;
 	})();
@@ -82,20 +92,25 @@
 		};
 		ZhezhaoYuan.prototype.draw = function(ctx)
 		{
-			ctx.save();
 			ctx.beginPath();
 			ctx.translate(this.x, this.y);
-			ctx.globalCompositeOperation = "destination-in";
 			ctx.arc(this.banjing, this.banjing, this.banjing, 0, 2*Math.PI);
-			ctx.fill();
-			ctx.restore();
+			ctx.clip();
+		};
+		ZhezhaoYuan.prototype.stroke = function(ctx)
+		{
 			if(this.borderSize && this.borderColor)
 			{
+				ctx.save();
+				ctx.beginPath();
+				ctx.translate(this.x, this.y);
+				ctx.arc(this.banjing, this.banjing, this.banjing, 0, 2*Math.PI);
 				ctx.lineWidth = this.borderSize;
 				ctx.strokeStyle = this.borderColor;
 				ctx.stroke();
+				ctx.restore();
 			}
-		}
+		};
 		return ZhezhaoYuan;
 	})();
 
@@ -185,6 +200,8 @@
 		var speedY = shuzhi.shuzhi==0?0:(blRect.y - targetHeight) / shuzhi.shuzhi * speedC;
 		//var speedY = shuzhi.shuzhi==0?0:shuzhi.shuzhi/(blRect.y - targetHeight);
 		
+		blRect.zhezhao = zhezhao;
+
 		canvas.runner = function(){
 			ctx.clearRect(0,0,canvas.width,canvas.height);
 
@@ -205,7 +222,7 @@
 
 			blRect.draw(ctx);
 			
-			zhezhao.draw(ctx);
+			//zhezhao.draw(ctx);
 
 			if(shuzhi.cur < shuzhi.shuzhi)
 			{

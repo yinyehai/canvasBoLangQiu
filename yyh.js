@@ -45,15 +45,11 @@
 		};
 		BlRect.prototype.draw = function(ctx)
 		{
-
-			
-
 			ctx.save();
 
 			if(this.zhezhao){
 				this.zhezhao.draw(ctx);
 			}
-
 			ctx.translate(this.x,this.y);
 			ctx.beginPath();
 			ctx.moveTo(0,0);
